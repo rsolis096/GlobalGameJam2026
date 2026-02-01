@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("Movement")]
     public float maxSpeed = 7f;
-    float tiltAngle;
+    public float tiltAngle;
 
     [Header("Fail")]
     public float failTiltAngleDeg = 40f;
@@ -44,6 +44,7 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
+        //Debug.Log("Tilt Angle: " + tiltAngle);
         leanInput = Vector2.zero;
         if (Keyboard.current != null)
         {
