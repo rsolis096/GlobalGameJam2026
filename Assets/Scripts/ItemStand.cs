@@ -1,11 +1,21 @@
 using Unity.VisualScripting;
 using UnityEngine;
 
+[SerializeField]
+public enum StandType
+{
+    Locking,
+    Normal,
+};
+
+
 public class ItemStand : MonoBehaviour
 {
-    public Grabbable holdingObject = null;
+    public Grabbable placedItem = null;
     public GameObject ItemShowcase = null;
     public Transform ItemPosition = null;
+
+    public StandType standType = StandType.Normal;
 
     Renderer r;
     MaterialPropertyBlock mpb;
@@ -16,10 +26,15 @@ public class ItemStand : MonoBehaviour
     public float offScale = 0f;
     public float onScale = 1.05f;
 
+    public void Start()
+    {
+        placedItem = GetComponentInChildren<Grabbable>();
+    }
+
     public void PlaceItem(Grabbable itemToPlace)
     {
 
-        if (itemToPlace && !holdingObject)
+        if (itemToPlace && !placedItem)
         {
 
             Debug.Log("Plcae Item Called!");
@@ -29,14 +44,24 @@ public class ItemStand : MonoBehaviour
             itemToPlace.transform.localPosition = Vector3.zero;
             itemToPlace.transform.localRotation = Quaternion.Euler(Vector3.zero);
 
-            holdingObject = itemToPlace;
+            placedItem = itemToPlace;
+
+            HighlightOff();
+
+            if (standType == StandType.Locking)
+            {
+                if(Level.LevelInstance) Level.LevelInstance.PlayPurchaseAudio();
+                placedItem.canBeGrabbed = false;
+            }
         }
     }
 
     public void RemoveItem()
     {
         Debug.Log("Remove Item Called!");
-        holdingObject = null;
+
+        if (standType != StandType.Locking)
+            placedItem = null;
     }
 
     void Awake()
@@ -58,7 +83,7 @@ public class ItemStand : MonoBehaviour
 
     public void HighlightOn()
     {
-        if (!r) return;
+        if (!r && !placedItem) return;
 
         r.GetPropertyBlock(mpb, 0);
         mpb.SetFloat(ScaleID, onScale);
