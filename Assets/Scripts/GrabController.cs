@@ -18,6 +18,7 @@ public class GrabController : MonoBehaviour
         if (other.gameObject.layer == LayerMask.NameToLayer("Grabbable"))
         {
             nearbyGrabbable = other.GetComponent<Grabbable>();
+            nearbyGrabbable.HighlightOn();
             Debug.Log("Entered trigger: " + other.name);
         }
         else if (other.gameObject.layer == LayerMask.NameToLayer("ItemStand"))
@@ -31,6 +32,7 @@ public class GrabController : MonoBehaviour
     {
         if (other.gameObject.layer == LayerMask.NameToLayer("Grabbable"))
         {
+            nearbyGrabbable?.HighlightOff();
             if (other.GetComponent<Grabbable>() == nearbyGrabbable)
                 nearbyGrabbable = null;
 
