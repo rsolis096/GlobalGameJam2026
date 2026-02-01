@@ -1,22 +1,36 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-[RequireComponent(typeof(Rigidbody))]
 public class PlayerController : MonoBehaviour
 {
     [Header("Refs")]
     public TiltHandler tilt;
 
-
     [Header("Movement")]
     public float maxSpeed = 7f;
-    public float moveForce = 35f;
+    float tiltAngle;
 
-    // Raise this to make it a bit easier to recover from tipping over
-    float recoveryMultiplier = 10f; 
+    [Header("Fail")]
+    public float failTiltAngleDeg = 40f;
+    public bool isFailed;
+
+    public float recoveryMultiplier = 5f;
+
+    [Header("Recovery (simple)")]
+    public float uprightAssist = 25f;
+    public float angularDamping = 6f;
+    [Range(0f, 1f)] public float inputAssist = 0.35f;
+    public float maxAngVel = 15f;
 
     Rigidbody rb;
-    Vector2 moveInput;
+    Vector2 leanInput;
+
+    public Transform PlayerRoot;
+
+    public float maxRotation = 30f;
+    public float currentRotation = 0f;
+
+    Vector3 actualLeanDir = Vector3.zero;
 
     void Awake()
     {
@@ -25,55 +39,120 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        moveInput = Vector2.zero;
+        leanInput = Vector2.zero;
         if (Keyboard.current != null)
         {
-            if (Keyboard.current.wKey.isPressed) moveInput.y += 1;
-            if (Keyboard.current.sKey.isPressed) moveInput.y -= 1;
-            if (Keyboard.current.dKey.isPressed) moveInput.x += 1;
-            if (Keyboard.current.aKey.isPressed) moveInput.x -= 1;
+            if (Keyboard.current.wKey.isPressed) leanInput.y += 1;
+            if (Keyboard.current.sKey.isPressed) leanInput.y -= 1;
+            if (Keyboard.current.dKey.isPressed) leanInput.x += 1;
+            if (Keyboard.current.aKey.isPressed) leanInput.x -= 1;
+
         }
-        moveInput = moveInput.normalized;
+        leanInput = leanInput.normalized;
     }
 
     void FixedUpdate()
     {
+        if (isFailed) return;
+
         float deltaTime = Time.fixedDeltaTime;
 
-        Vector3 inputDir = new Vector3(moveInput.x, 0f, moveInput.y);
-        if (inputDir.sqrMagnitude > 1f) inputDir.Normalize();
+        tiltAngle = Mathf.Lerp(tiltAngle, Vector3.Angle(transform.up, Vector3.up), deltaTime);
+
+        if (tiltAngle > failTiltAngleDeg)
+        {
+            isFailed = true;
+            Debug.Log($"Failed! tiltAngle={tiltAngle}");
+            return;
+        }
+
+        Vector3 leanInputDir = new Vector3(leanInput.x, 0f, leanInput.y);
+        if (leanInputDir.sqrMagnitude > 1f) leanInputDir.Normalize();
 
         if (tilt != null)
-            tilt.SetLean(inputDir, deltaTime);
+            tilt.SetLean(leanInputDir, deltaTime);
 
-        ApplyInput(inputDir, deltaTime);
+        ApplyRecoveryTorque(leanInputDir);
 
+        ApplyLeanInput(leanInputDir, deltaTime);
+
+        //ApplyRotation();       
     }
 
-    void ApplyInput(Vector3 inputDir, float deltaTime)
+    void ApplyRotation()
+    {
+        if (actualLeanDir.sqrMagnitude < 1e-6f) return;
+
+        Quaternion targetYaw = Quaternion.LookRotation(actualLeanDir, Vector3.up);
+
+        Vector3 currentEuler = rb.rotation.eulerAngles;
+        Vector3 targetEuler = targetYaw.eulerAngles;
+
+        rb.MoveRotation(Quaternion.Euler(currentEuler.x, targetEuler.y, currentEuler.z));
+    }
+
+    void ApplyRecoveryTorque(Vector3 inputDir)
+    {
+        rb.AddTorque(-rb.angularVelocity * angularDamping, ForceMode.Acceleration);
+
+        float tilt01 = Mathf.Clamp01(tiltAngle / failTiltAngleDeg);
+
+        Vector3 desiredUp = Vector3.up;
+
+        if (inputDir.sqrMagnitude > 1e-6f)
+        {
+            inputDir.y = 0f;
+            inputDir.Normalize();
+            desiredUp = (Vector3.up + inputDir * inputAssist).normalized;
+        }
+
+        Vector3 currentUp = transform.up;
+        Vector3 axis = Vector3.Cross(currentUp, desiredUp);
+
+        rb.AddTorque(axis * (uprightAssist * tilt01), ForceMode.Acceleration);
+    }
+
+    Vector3 leanDir = Vector3.zero;
+    float leanSpeedMultiplier = 0f;
+
+    void ApplyLeanInput(Vector3 inputDir, float deltaTime)
     {
         if (tilt == null) return;
 
         Vector3 vel = rb.linearVelocity;
         vel.y = 0f;
 
-        // Alignment of 1 means leaning fully in the input direction (bad)
-        Vector3 leanDir = tilt.LeanWorldDir.normalized;
+        leanDir = tilt.LeanWorldDir.normalized;
+        Debug.DrawLine(transform.position, transform.position + leanDir * 10f, Color.red);
+
         float alignment = Vector3.Dot(leanDir, inputDir);
+        leanSpeedMultiplier = Mathf.Max(0f, alignment) * tilt.CurrentLean;
 
-        // Acceleration force should be faster the more we are leaning into the direction
-        float leanSpeedMultiplier = Mathf.Max(0f, alignment) * tilt.CurrentLean;
-
-        Vector3 force = inputDir * (moveForce * leanSpeedMultiplier);
+        Vector3 force = inputDir * leanSpeedMultiplier;
         rb.AddForce(force, ForceMode.Acceleration);
 
-        float speed = vel.magnitude;
-        if (speed > maxSpeed)
-        {
-            Vector3 capped = vel.normalized * maxSpeed;
-            rb.linearVelocity = new Vector3(capped.x, vel.y, capped.z);
-        }
-
         rb.AddForce(-vel * recoveryMultiplier, ForceMode.Acceleration);
+
+        actualLeanDir = Vector3.ProjectOnPlane(Vector3.down, transform.up);
+        actualLeanDir = Vector3.ProjectOnPlane(actualLeanDir, Vector3.up);
+
+        if (actualLeanDir.sqrMagnitude > 1e-6f)
+            actualLeanDir.Normalize();
+        else
+            actualLeanDir = Vector3.zero;
+
+        Debug.DrawLine(transform.position, transform.position + actualLeanDir * 6f, Color.cyan);
+
+        float speed01 = Mathf.Clamp01(tiltAngle / failTiltAngleDeg);
+
+        speed01 *= speed01;
+
+        float rootMoveSpeed = maxSpeed * speed01;
+
+        if (PlayerRoot != null && actualLeanDir != Vector3.zero)
+        {
+            PlayerRoot.position += actualLeanDir * (rootMoveSpeed * deltaTime);
+        }
     }
+
 }
