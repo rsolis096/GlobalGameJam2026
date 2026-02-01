@@ -12,6 +12,8 @@ public class Grabbable : MonoBehaviour
     public float offScale = 0f;
     public float onScale = 1.05f;
 
+    public bool canBeGrabbed = true;
+
     void Awake()
     {
         if (!HighlightedObject) return;
@@ -28,7 +30,7 @@ public class Grabbable : MonoBehaviour
 
     public void HighlightOn()
     {
-        if (!HighlightedObject) return;
+        if (!HighlightedObject || !canBeGrabbed) return;
 
         HighlightedObject.GetPropertyBlock(mpb, 1);     
         mpb.SetFloat(ScaleID, onScale);
