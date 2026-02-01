@@ -29,8 +29,9 @@ public class UIOverlayController : MonoBehaviour
         InteractText.gameObject.SetActive(false);
     }
 
-    public void ShowInteractText(bool show)
+    public void ShowInteractText(bool show, string text)
     {
+        InteractText.SetText(text);
         InteractText.gameObject.SetActive(show);
     }
 

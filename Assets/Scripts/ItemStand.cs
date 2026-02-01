@@ -5,6 +5,7 @@ public class ItemStand : MonoBehaviour
 {
     public Grabbable holdingObject = null;
     public GameObject ItemShowcase = null;
+    public Transform ItemPosition = null;
 
     Renderer r;
     MaterialPropertyBlock mpb;
@@ -23,7 +24,7 @@ public class ItemStand : MonoBehaviour
 
             Debug.Log("Plcae Item Called!");
 
-            itemToPlace.transform.SetParent(this.transform);
+            itemToPlace.transform.SetParent(ItemPosition.transform);
 
             itemToPlace.transform.localPosition = Vector3.zero;
             itemToPlace.transform.localRotation = Quaternion.Euler(Vector3.zero);

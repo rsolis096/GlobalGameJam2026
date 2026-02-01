@@ -13,14 +13,11 @@ public class TiltHandler : MonoBehaviour
     public float CurrentLean; 
     public Vector3 LeanWorldDir = Vector3.forward;
 
-    [Range(0f, 1f)] public float failLean01 = 0.95f; 
-    public bool IsFailed = false;
 
     void OnEnable()
     {
         leanDeg = Vector2.zero;
         CurrentLean = 0f;
-        IsFailed = false;
         LeanWorldDir = Vector3.forward;
     }
 

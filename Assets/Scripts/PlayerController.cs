@@ -7,6 +7,7 @@ public class PlayerController : MonoBehaviour
     [Header("Refs")]
     public TiltHandler tilt;
     public Transform Visuals;
+    public GrabController grabController;
 
     [Header("Movement")]
     public float maxSpeed = 7f;
@@ -37,6 +38,8 @@ public class PlayerController : MonoBehaviour
     void Awake()
     {
         rb = GetComponent<Rigidbody>();
+        grabController = GetComponentInChildren<GrabController>();
+
     }
 
     void Update()
@@ -77,8 +80,6 @@ public class PlayerController : MonoBehaviour
         ApplyRecoveryTorque(leanInputDir);
 
         ApplyLeanInput(leanInputDir, deltaTime);
-
-        //ApplyRotation();       
     }
 
     void ApplyRotation()
@@ -106,12 +107,15 @@ public class PlayerController : MonoBehaviour
             inputDir.y = 0f;
             inputDir.Normalize();
             desiredUp = (Vector3.up + inputDir * inputAssist).normalized;
+
+            Vector3 currentUp = transform.up;
+            Vector3 axis = Vector3.Cross(currentUp, desiredUp);
+
+            rb.AddTorque(axis * (uprightAssist * tilt01), ForceMode.Acceleration);
+
         }
 
-        Vector3 currentUp = transform.up;
-        Vector3 axis = Vector3.Cross(currentUp, desiredUp);
 
-        rb.AddTorque(axis * (uprightAssist * tilt01), ForceMode.Acceleration);
     }
 
     Vector3 leanDir = Vector3.zero;

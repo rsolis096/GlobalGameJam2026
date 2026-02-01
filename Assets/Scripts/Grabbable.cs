@@ -2,8 +2,9 @@ using UnityEngine;
 
 public class Grabbable : MonoBehaviour
 {
-    Renderer r;
     MaterialPropertyBlock mpb;
+
+    public Renderer HighlightedObject;
 
     static readonly int ScaleID = Shader.PropertyToID("_Scale");
 
@@ -13,10 +14,9 @@ public class Grabbable : MonoBehaviour
 
     void Awake()
     {
-        r = GetComponent<Renderer>();
-        if (!r) return;
+        if (!HighlightedObject) return;
 
-        if (r.sharedMaterials == null || r.sharedMaterials.Length < 2)
+        if (HighlightedObject.sharedMaterials == null || HighlightedObject.sharedMaterials.Length < 2)
         {
             Debug.LogWarning($"{name} does not have 2 materials");
             return;
@@ -28,19 +28,19 @@ public class Grabbable : MonoBehaviour
 
     public void HighlightOn()
     {
-        if (!r) return;
+        if (!HighlightedObject) return;
 
-        r.GetPropertyBlock(mpb, 1);     
+        HighlightedObject.GetPropertyBlock(mpb, 1);     
         mpb.SetFloat(ScaleID, onScale);
-        r.SetPropertyBlock(mpb, 1);
+        HighlightedObject.SetPropertyBlock(mpb, 1);
     }
 
     public void HighlightOff()
     {
-        if (!r) return;
+        if (!HighlightedObject) return;
 
-        r.GetPropertyBlock(mpb, 1);     
+        HighlightedObject.GetPropertyBlock(mpb, 1);     
         mpb.SetFloat(ScaleID, offScale);
-        r.SetPropertyBlock(mpb, 1);
+        HighlightedObject.SetPropertyBlock(mpb, 1);
     }
 }
