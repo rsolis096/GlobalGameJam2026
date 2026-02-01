@@ -21,7 +21,7 @@ public class PlayerAnimation : MonoBehaviour
         float forwardValue = Mathf.Lerp(0, 1, playerController.tiltAngle / walkAngle);
         animator.SetFloat("Forwards", forwardValue);
 
-        if (Keyboard.current.spaceKey.wasPressedThisFrame)
+        if (Keyboard.current.eKey.wasPressedThisFrame)
         {
             animator.SetTrigger("PickUp");
         }
