@@ -18,16 +18,22 @@ public class GrabController : MonoBehaviour
         if (other.gameObject.layer == LayerMask.NameToLayer("Grabbable"))
         {
             nearbyGrabbable = other.GetComponent<Grabbable>();
-            nearbyGrabbable.HighlightOn();
-            UIOverlayController.Instance.ShowInteractText(true, "Press E To Grab");
-            Debug.Log("Entered trigger: " + other.name);
+            if(nearbyGrabbable != null)
+            {   
+                if(nearbyGrabbable.canBeGrabbed)
+                {
+                    nearbyGrabbable.HighlightOn();
+                    UIOverlayController.Instance.ShowInteractText(true, "Press E To Grab");
+                    Debug.Log("Entered trigger: " + other.name);
+                }
+            }
         }
         else if (other.gameObject.layer == LayerMask.NameToLayer("ItemStand"))
         {
             nearbyItemStand = other.GetComponent<ItemStand>();
             nearbyItemStand.HighlightOn();
             Debug.Log("Entered trigger: " + other.name);
-            if(holdingGrabbable)
+            if (holdingGrabbable && !nearbyItemStand.placedItem)
                 UIOverlayController.Instance.ShowInteractText(true, "Press E To Place Item");
         }
     }
@@ -66,11 +72,13 @@ public class GrabController : MonoBehaviour
 
         if (holdingGrabbable != null && nearbyItemStand != null)
         {
-            AttemptPlace();
+            if(nearbyItemStand.placedItem == null)
+                AttemptPlace();
         }
         else if (holdingGrabbable == null && nearbyGrabbable != null)
         {
-            AttemptGrab();
+            if(nearbyGrabbable.canBeGrabbed)
+                AttemptGrab();
         }
     }
 
@@ -82,6 +90,7 @@ public class GrabController : MonoBehaviour
             holdingGrabbable.transform.SetParent(null);
             nearbyItemStand.PlaceItem(holdingGrabbable);
             holdingGrabbable = null;
+            UIOverlayController.Instance.ShowInteractText(false, "Press E To Interact");
         }
     }
 
@@ -102,6 +111,11 @@ public class GrabController : MonoBehaviour
 
             nearbyGrabbable.HighlightOff();
             UIOverlayController.Instance.ShowInteractText(false, "Press E To Interact");
+
+            if (Level.LevelInstance)
+            {
+                Level.LevelInstance.PlayPickupAudio();
+            }
         }
     }
 }
