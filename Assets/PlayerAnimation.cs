@@ -19,9 +19,11 @@ public class PlayerAnimation : MonoBehaviour
     void Update()
     {
         float forwardValue = Mathf.Lerp(0, 1, playerController.tiltAngle / walkAngle);
-
-        Debug.Log("Setting animation forwards to: " + forwardValue);
         animator.SetFloat("Forwards", forwardValue);
 
+        if (Keyboard.current.eKey.wasPressedThisFrame)
+        {
+            animator.SetTrigger("PickUp");
+        }
     }
 }
