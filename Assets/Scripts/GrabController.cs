@@ -19,12 +19,15 @@ public class GrabController : MonoBehaviour
         {
             nearbyGrabbable = other.GetComponent<Grabbable>();
             nearbyGrabbable.HighlightOn();
+            UIOverlayController.Instance.ShowInteractText(true);
             Debug.Log("Entered trigger: " + other.name);
         }
         else if (other.gameObject.layer == LayerMask.NameToLayer("ItemStand"))
         {
             nearbyItemStand = other.GetComponent<ItemStand>();
+            nearbyItemStand.HighlightOn();
             Debug.Log("Entered trigger: " + other.name);
+            UIOverlayController.Instance.ShowInteractText(true);
         }
     }
 
@@ -36,14 +39,18 @@ public class GrabController : MonoBehaviour
             if (other.GetComponent<Grabbable>() == nearbyGrabbable)
                 nearbyGrabbable = null;
 
+            UIOverlayController.Instance.ShowInteractText(false);
             Debug.Log("Exited trigger: " + other.name);
         }
         else if (other.gameObject.layer == LayerMask.NameToLayer("ItemStand"))
         {
+            nearbyItemStand.HighlightOff();
             if (other.GetComponent<ItemStand>() == nearbyItemStand)
                 nearbyItemStand = null;
 
             Debug.Log("Exited trigger: " + other.name);
+            UIOverlayController.Instance.ShowInteractText(false);
+
         }
     }
 
@@ -91,6 +98,9 @@ public class GrabController : MonoBehaviour
             nearbyGrabbable.transform.localRotation = Quaternion.Euler(Vector3.zero);
 
             holdingGrabbable = nearbyGrabbable;
+
+            nearbyGrabbable.HighlightOff();
+            UIOverlayController.Instance.ShowInteractText(false);
         }
     }
 }
