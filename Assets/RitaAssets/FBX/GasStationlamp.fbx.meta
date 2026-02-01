@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 237d32a4f3cf2254999eedf549e07db0
+guid: fd0661b28ec6a2e4fb77b9370fdd4ca7
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
@@ -7,8 +7,13 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: M_Juice
-    second: {fileID: 2100000, guid: 271f2e797f71a5d4cb4afc293b33f53d, type: 2}
+      name: Lamp_Metal
+    second: {fileID: 2100000, guid: 2d8cac60626bddc4c98627c3a67f601c, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: lightBulb
+    second: {fileID: 2100000, guid: 6f5055cd5985d9d48a2a14b32df592a9, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0

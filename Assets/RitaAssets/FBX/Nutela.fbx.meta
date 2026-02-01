@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: 237d32a4f3cf2254999eedf549e07db0
+guid: f416e3485ce1ba24682ce17940821016
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
@@ -7,8 +7,23 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: M_Juice
-    second: {fileID: 2100000, guid: 271f2e797f71a5d4cb4afc293b33f53d, type: 2}
+      name: JAR GLASS
+    second: {fileID: 2100000, guid: 10eb8b5b8811a794f97e8b900d57156d, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: NUTELLA CAP
+    second: {fileID: 2100000, guid: 7ae5189615af50143b664db22013688f, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: NUTELLA PACKAGE
+    second: {fileID: 2100000, guid: c4164772abf15ba478ede0f170ad4b48, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: NUTELLA_
+    second: {fileID: 2100000, guid: 35f0002705ad1e044bf0ec4d19b687ec, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
