@@ -5,7 +5,7 @@ public class SceneBootstrap : MonoBehaviour
 {
     private string uiSceneName = "GameUI";
 
-    void Start()
+    void Awake()
     {
         if (!SceneManager.GetSceneByName(uiSceneName).isLoaded)
         {
