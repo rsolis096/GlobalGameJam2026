@@ -1,10 +1,12 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
+using static UnityEngine.GraphicsBuffer;
 
 public class PlayerController : MonoBehaviour
 {
     [Header("Refs")]
     public TiltHandler tilt;
+    public Transform Visuals;
 
     [Header("Movement")]
     public float maxSpeed = 7f;
@@ -123,7 +125,7 @@ public class PlayerController : MonoBehaviour
         vel.y = 0f;
 
         leanDir = tilt.LeanWorldDir.normalized;
-        Debug.DrawLine(transform.position, transform.position + leanDir * 10f, Color.red);
+        //Debug.DrawLine(transform.position, transform.position + leanDir * 10f, Color.red);
 
         float alignment = Vector3.Dot(leanDir, inputDir);
         leanSpeedMultiplier = Mathf.Max(0f, alignment) * tilt.CurrentLean;
@@ -141,17 +143,25 @@ public class PlayerController : MonoBehaviour
         else
             actualLeanDir = Vector3.zero;
 
-        Debug.DrawLine(transform.position, transform.position + actualLeanDir * 6f, Color.cyan);
+        //Debug.DrawLine(transform.position, transform.position + actualLeanDir * 6f, Color.cyan);
 
         float speed01 = Mathf.Clamp01(tiltAngle / failTiltAngleDeg);
-
         speed01 *= speed01;
 
         float rootMoveSpeed = maxSpeed * speed01;
-
         if (PlayerRoot != null && actualLeanDir != Vector3.zero)
         {
             PlayerRoot.position += actualLeanDir * (rootMoveSpeed * deltaTime);
+        }
+
+        if (Visuals)
+        {
+            if (actualLeanDir.magnitude > 1e-6f)
+            {
+                actualLeanDir.y = 0;
+                Quaternion rotation = Quaternion.LookRotation(actualLeanDir);
+                Visuals.transform.localRotation = Quaternion.Slerp(Visuals.transform.localRotation, rotation, deltaTime * 2f);
+            }
         }
     }
 

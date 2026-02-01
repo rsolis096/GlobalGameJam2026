@@ -2,35 +2,45 @@ using UnityEngine;
 
 public class Grabbable : MonoBehaviour
 {
-    public Rigidbody rb;
+    Renderer r;
+    MaterialPropertyBlock mpb;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    static readonly int ScaleID = Shader.PropertyToID("_Scale");
+
+    [Header("Highlight Scale")]
+    public float offScale = 0f;
+    public float onScale = 1.05f;
+
+    void Awake()
     {
-        rb = GetComponent<Rigidbody>();
+        r = GetComponent<Renderer>();
+        if (!r) return;
+
+        if (r.sharedMaterials == null || r.sharedMaterials.Length < 2)
+        {
+            Debug.LogWarning($"{name} does not have 2 materials");
+            return;
+        }
+
+        mpb = new MaterialPropertyBlock();
+        HighlightOff(); 
     }
 
-    public void Drop()
+    public void HighlightOn()
     {
-        if (rb)
-        {
-            rb.useGravity = true;
-            rb.isKinematic = false;
+        if (!r) return;
 
-            Collider grabbableCollider = GetComponent<Collider>();
-            if (grabbableCollider) grabbableCollider.enabled = true;
-        }
+        r.GetPropertyBlock(mpb, 1);     
+        mpb.SetFloat(ScaleID, onScale);
+        r.SetPropertyBlock(mpb, 1);
     }
 
-    public void Pickup()
+    public void HighlightOff()
     {
-        if (rb)
-        {
-            rb.useGravity = false;
-            rb.isKinematic = true;
+        if (!r) return;
 
-            Collider grabbableCollider = GetComponent<Collider>();
-            if (grabbableCollider) grabbableCollider.enabled = false;
-        }
+        r.GetPropertyBlock(mpb, 1);     
+        mpb.SetFloat(ScaleID, offScale);
+        r.SetPropertyBlock(mpb, 1);
     }
 }
