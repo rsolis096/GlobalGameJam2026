@@ -32,17 +32,17 @@ public class Grabbable : MonoBehaviour
     {
         if (!HighlightedObject || !canBeGrabbed) return;
 
-        HighlightedObject.GetPropertyBlock(mpb, 1);     
+        HighlightedObject.GetPropertyBlock(mpb, 3);     
         mpb.SetFloat(ScaleID, onScale);
-        HighlightedObject.SetPropertyBlock(mpb, 1);
+        HighlightedObject.SetPropertyBlock(mpb, 3);
     }
 
     public void HighlightOff()
     {
         if (!HighlightedObject) return;
 
-        HighlightedObject.GetPropertyBlock(mpb, 1);     
+        HighlightedObject.GetPropertyBlock(mpb, 3);     
         mpb.SetFloat(ScaleID, offScale);
-        HighlightedObject.SetPropertyBlock(mpb, 1);
+        HighlightedObject.SetPropertyBlock(mpb, 3);
     }
 }

@@ -24,7 +24,6 @@ public class SplineMover : MonoBehaviour
 
         t = Mathf.Repeat(t + speedT * Time.deltaTime, 1f);
 
-        // IMPORTANT: use container eval directly (likely already world space)
         Vector3 worldPos = spline.EvaluatePosition(t);
         Vector3 worldTan = spline.EvaluateTangent(t);
 
