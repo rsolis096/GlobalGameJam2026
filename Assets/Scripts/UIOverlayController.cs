@@ -34,33 +34,50 @@ public class UIOverlayController : MonoBehaviour
         if (!FadeImage) yield break;
 
         FadeText.enabled = true;
+        FadeImage.enabled = true;
 
         float startAlpha = fadeOut ? 1f : 0f;
         float endAlpha = fadeOut ? 0f : 1f;
 
         float elapsed = 0f;
 
-        Color c = FadeImage.color;
-        c.a = startAlpha;
-        FadeImage.color = c;
+        Color imageColor = FadeImage.color;
+        imageColor.a = startAlpha;
+        FadeImage.color = imageColor;
+
+        Color textColor = FadeText.color;
+        textColor.a = startAlpha;
+        FadeText.color = textColor;
 
         while (elapsed < fadeTimeSeconds)
         {
             elapsed += Time.deltaTime;
             float t = Mathf.Clamp01(elapsed / fadeTimeSeconds);
-            t = t * t;  
+            t = t * t;  // easing
 
-            c.a = Mathf.Lerp(startAlpha, endAlpha, t);
-            FadeImage.color = c;
+            // Update alpha each frame
+            imageColor.a = Mathf.Lerp(startAlpha, endAlpha, t);
+            textColor.a = Mathf.Lerp(startAlpha, endAlpha, t);
+
+            FadeImage.color = imageColor;
+            FadeText.color = textColor;
 
             yield return null;
         }
 
-        c.a = endAlpha;
-        FadeImage.color = c;
+        // Ensure final value
+        imageColor.a = endAlpha;
+        textColor.a = endAlpha;
+        FadeImage.color = imageColor;
+        FadeText.color = textColor;
 
-        if (fadeOut) FadeText.enabled = false;
+        if (fadeOut)
+        {
+            FadeText.enabled = false;
+            FadeImage.enabled = false;
+        }
     }
+
 
     public void ShowInteractText(bool show, string text)
     {

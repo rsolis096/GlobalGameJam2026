@@ -39,6 +39,8 @@ public class Cashier : MonoBehaviour
         if (Level.LevelInstance && !playedEnding)
         {
             Level.LevelInstance.PlayWinAudio();
+            UIOverlayController.Instance.StartCoroutine(UIOverlayController.Instance.FadeRoutine(5f, fadeOut: false));
+            UIOverlayController.Instance.FadeText.text = "You Win!";
         }
         playedEnding = true;
     }
