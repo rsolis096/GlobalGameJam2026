@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using static UnityEngine.GraphicsBuffer;
@@ -68,7 +69,7 @@ public class PlayerController : MonoBehaviour
         if (tiltAngle > failTiltAngleDeg)
         {
             isFailed = true;
-            Debug.Log($"Failed! tiltAngle={tiltAngle}");
+            StartCoroutine(GameFailRoutine());
             return;
         }
 
@@ -81,6 +82,25 @@ public class PlayerController : MonoBehaviour
         ApplyRecoveryTorque(leanInputDir);
 
         ApplyLeanInput(leanInputDir, deltaTime);
+    }
+
+    public IEnumerator GameFailRoutine() {
+        Debug.Log($"Failed! tiltAngle={tiltAngle}");
+
+        UIOverlayController.Instance.FadeText.text = "You Fail!";
+        yield return UIOverlayController.Instance.StartCoroutine(UIOverlayController.Instance.FadeRoutine(5f, fadeOut: false));
+        
+        Level.LevelInstance.ReloadLevel();
+
+        Color imageColor = UIOverlayController.Instance.FadeImage.color;
+        imageColor.a = 0f;
+        UIOverlayController.Instance.FadeImage.color = imageColor;
+
+        Color textColor = UIOverlayController.Instance.FadeText.color;
+        textColor.a = 0f;
+        UIOverlayController.Instance.FadeText.color = textColor;
+
+        Debug.Log("Level Reloaded");
     }
 
     void ApplyRotation()

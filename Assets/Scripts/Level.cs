@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class Level : MonoBehaviour
 {
@@ -67,5 +68,9 @@ public class Level : MonoBehaviour
                 LevelSoundsAudioSource.PlayOneShot(PickupSoundKlip);
             }
         }
+    }
+
+    public void ReloadLevel() {
+        SceneManager.LoadScene(0);
     }
 }
